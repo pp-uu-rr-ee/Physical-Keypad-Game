@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>อธิบายโค้ด · Keypad Math Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/site.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    .prose-th p { line-height: 1.9; }
+    .hljs { background: transparent; padding: 0; }
+    code, pre, .font-mono { font-variant-ligatures: none; }
+    section[id] { scroll-margin-top: 5rem; }
+  </style>
+</head>
+<body data-page="code" class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <header class="mb-10">
+    <p class="text-sm font-semibold text-brand-600">ส่วนที่ 5</p>
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mt-1">อธิบายโค้ดอย่างละเอียด</h1>
+    <p class="mt-3 text-slate-600 max-w-3xl leading-relaxed">
+      ไฟล์ <code class="font-mono bg-slate-100 px-1 rounded">keypad_game.ino</code> ยาว 436 บรรทัด แบ่งเป็นการตั้งค่า ตัวแปรสถานะ
+      ฟังก์ชันย่อย 10 ฟังก์ชัน และ <code class="font-mono">setup()</code> / <code class="font-mono">loop()</code>
+      ตัวเลขด้านซ้ายของโค้ดแต่ละส่วนคือเลขบรรทัดจริงในไฟล์
+    </p>
+  </header>
+
+  <div class="lg:grid lg:grid-cols-[220px_1fr] gap-10">
+    <!-- TOC -->
+    <aside class="hidden lg:block">
+      <nav id="toc" class="sticky top-24 text-sm space-y-1 border-l border-slate-200"></nav>
+    </aside>
+
+    <div class="prose-th space-y-16 min-w-0">
+
+      <!-- Overview -->
+      <section id="overview" data-toc="ภาพรวม">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">1. ภาพรวมการทำงาน</h2>
+        <p class="text-slate-700">
+          โปรแกรมทำงานเป็น <strong>State Machine</strong> ที่มี 3 สถานะ เก็บในตัวแปร <code class="font-mono">state</code>
+          และในสถานะ "เล่น" ยังมีสถานะย่อย <code class="font-mono">feedback</code> สำหรับแสดงข้อความชั่วคราว 1 วินาที
+          ทุกอย่างทำงานใน <code class="font-mono">loop()</code> โดยไม่ใช้ <code class="font-mono">delay()</code> เลย
+          จึงอ่านปุ่มและนับเวลาได้พร้อมกัน
+        </p>
+        <div class="mt-6 p-6 rounded-2xl bg-white border border-slate-200 overflow-x-auto">
+          <div class="flex items-center gap-3 min-w-[560px]">
+            <div class="flex-1 p-4 rounded-xl bg-slate-100 text-center"><div class="font-mono text-xs text-slate-500">state = 0</div><div class="font-semibold">รอเริ่ม</div></div>
+            <div class="text-center text-xs text-slate-500">กด #<div class="text-2xl text-slate-400">→</div></div>
+            <div class="flex-1 p-4 rounded-xl bg-brand-600 text-white text-center"><div class="font-mono text-xs text-brand-100">state = 1</div><div class="font-semibold">กำลังเล่น</div></div>
+            <div class="text-center text-xs text-slate-500">เวลา = 0<div class="text-2xl text-slate-400">→</div></div>
+            <div class="flex-1 p-4 rounded-xl bg-rose-100 text-center"><div class="font-mono text-xs text-rose-600">state = 2</div><div class="font-semibold">หมดเวลา</div></div>
+          </div>
+          <p class="text-center text-xs text-slate-500 mt-3 min-w-[560px]">จากสถานะ 2 กด # อีกครั้งจะกลับไปสถานะ 1 (เริ่มรอบใหม่)</p>
+        </div>
+        <div class="mt-6 grid sm:grid-cols-2 gap-4 text-sm">
+          <div class="p-4 rounded-xl bg-white border border-slate-200">
+            <h3 class="font-semibold mb-2">ลำดับการเรียกฟังก์ชัน</h3>
+            <ul class="font-mono space-y-1 text-slate-700">
+              <li>loop() → readKey() → handleKey()</li>
+              <li>handleKey() → calculate() / show()</li>
+              <li>startRound() → newPuzzle() → resetAnswer()</li>
+              <li>show() → secondsLeft() / clearLine()</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-white border border-slate-200">
+            <h3 class="font-semibold mb-2">ค่า feedback</h3>
+            <ul class="space-y-1 text-slate-700">
+              <li><code class="font-mono">0</code> ไม่มีข้อความ (รับปุ่มตามปกติ)</li>
+              <li><code class="font-mono">1</code> ตอบถูก → ไปโจทย์ใหม่</li>
+              <li><code class="font-mono">2</code> ใช้เลขไม่ครบ → ทำโจทย์เดิม</li>
+              <li><code class="font-mono">3</code> ตอบผิด → ทำโจทย์เดิม</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Includes -->
+      <section id="setup-libs" data-toc="ไลบรารีและ Keypad">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">2. ไลบรารี จอ LCD และแผนผัง Keypad</h2>
+        <pre data-lines="1-15"></pre>
+        <ul class="mt-4 space-y-2 text-slate-700 list-disc pl-5">
+          <li><code class="font-mono">Wire.h</code> ไลบรารีสื่อสาร I2C ของ Arduino ใช้ขา A4 (SDA) และ A5 (SCL)</li>
+          <li><code class="font-mono">LiquidCrystal_I2C.h</code> ควบคุมจอ LCD ผ่านโมดูล PCF8574 (ติดตั้งผ่าน Library Manager)</li>
+          <li><code class="font-mono">math.h</code> ใช้ <code class="font-mono">NAN</code>, <code class="font-mono">isfinite()</code>, <code class="font-mono">fabs()</code>, <code class="font-mono">round()</code></li>
+          <li><code class="font-mono">lcd(0x27, 16, 2)</code> สร้างออบเจกต์จอที่แอดเดรส 0x27 ขนาด 16 ตัวอักษร × 2 แถว</li>
+          <li><code class="font-mono">rows</code> / <code class="font-mono">cols</code> เก็บหมายเลขขาของแถวและคอลัมน์ ใช้ชนิด <code class="font-mono">byte</code> เพื่อประหยัด RAM (UNO มีเพียง 2 KB)</li>
+          <li><code class="font-mono">keys[4][4]</code> ตารางที่จับคู่ตำแหน่ง (แถว, คอลัมน์) กับตัวอักษรบนปุ่ม ตรงกับหน้าตาของ Keypad จริง</li>
+        </ul>
+      </section>
+
+      <!-- Variables -->
+      <section id="vars" data-toc="ค่าคงที่และตัวแปร">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">3. ค่าคงที่และตัวแปรสถานะ</h2>
+        <pre data-lines="17-41"></pre>
+        <p class="mt-4 text-slate-700">
+          ค่าเวลาเป็นมิลลิวินาทีและลงท้ายด้วย <code class="font-mono">UL</code> (unsigned long) เพื่อให้คำนวณร่วมกับ
+          <code class="font-mono">millis()</code> ได้ถูกต้องโดยไม่ล้นช่วงของ <code class="font-mono">int</code> (สูงสุด 32,767)
+        </p>
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 text-slate-600"><tr><th class="px-4 py-2 text-left">ตัวแปร</th><th class="px-4 py-2 text-left">ชนิด</th><th class="px-4 py-2 text-left">ความหมาย</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr><td class="px-4 py-2 font-mono">timeBonus</td><td class="px-4 py-2 font-mono">unsigned long</td><td class="px-4 py-2">เวลาโบนัสสะสม (เพิ่มครั้งละ 10,000 ms)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">feedbackStart</td><td class="px-4 py-2 font-mono">unsigned long</td><td class="px-4 py-2">เวลาที่เริ่มแสดงข้อความแจ้งผล</td></tr>
+              <tr><td class="px-4 py-2 font-mono">roundStart</td><td class="px-4 py-2 font-mono">unsigned long</td><td class="px-4 py-2">เวลาที่เริ่มรอบปัจจุบัน</td></tr>
+              <tr><td class="px-4 py-2 font-mono">numbers[4]</td><td class="px-4 py-2 font-mono">byte</td><td class="px-4 py-2">ตัวเลข 4 ตัวของโจทย์</td></tr>
+              <tr><td class="px-4 py-2 font-mono">used[4]</td><td class="px-4 py-2 font-mono">bool</td><td class="px-4 py-2">ตัวเลขช่องนั้นถูกใช้ไปแล้วหรือยัง</td></tr>
+              <tr><td class="px-4 py-2 font-mono">count</td><td class="px-4 py-2 font-mono">byte</td><td class="px-4 py-2">จำนวนตัวเลขที่ใช้ไปแล้ว (0–4)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">state</td><td class="px-4 py-2 font-mono">byte</td><td class="px-4 py-2">สถานะเกม 0/1/2</td></tr>
+              <tr><td class="px-4 py-2 font-mono">feedback</td><td class="px-4 py-2 font-mono">byte</td><td class="px-4 py-2">ข้อความที่กำลังแสดง 0/1/2/3</td></tr>
+              <tr><td class="px-4 py-2 font-mono">goal</td><td class="px-4 py-2 font-mono">int</td><td class="px-4 py-2">เป้าหมายของโจทย์ (10–99)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">score</td><td class="px-4 py-2 font-mono">int</td><td class="px-4 py-2">คะแนน (จำนวนข้อที่ตอบถูก)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">lastSeconds</td><td class="px-4 py-2 font-mono">int</td><td class="px-4 py-2">วินาทีที่แสดงบนจอครั้งล่าสุด ใช้ตัดสินว่าต้องวาดจอใหม่ไหม</td></tr>
+              <tr><td class="px-4 py-2 font-mono">result</td><td class="px-4 py-2 font-mono">float</td><td class="px-4 py-2">ผลลัพธ์สะสม (float เพราะการหารอาจได้ทศนิยม)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">operation</td><td class="px-4 py-2 font-mono">char</td><td class="px-4 py-2">เครื่องหมายที่รอใช้ (0 = ยังไม่เลือก)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">needNumber</td><td class="px-4 py-2 font-mono">bool</td><td class="px-4 py-2">true = รอตัวเลข, false = รอเครื่องหมาย</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- readKey -->
+      <section id="readKey" data-toc="readKey()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">4. <code class="font-mono">readKey()</code> — สแกน Keypad</h2>
+        <pre data-lines="43-61"></pre>
+        <div class="mt-4 space-y-3 text-slate-700">
+          <p>ฟังก์ชันนี้สแกน Keypad เองโดยไม่ใช้ไลบรารี Keypad.h ขณะพักขาทุกขาเป็น <code class="font-mono">INPUT_PULLUP</code> คืออ่านได้ HIGH</p>
+          <ol class="list-decimal pl-5 space-y-2">
+            <li><b>บรรทัด 46–48</b> เลือกแถวที่ r โดยเปลี่ยนเป็น OUTPUT แล้วส่ง LOW รอ 5 µs ให้แรงดันในสายนิ่ง</li>
+            <li><b>บรรทัด 50–55</b> อ่านทั้ง 4 คอลัมน์ ถ้าคอลัมน์ c อ่านได้ LOW แปลว่าปุ่มที่ (r, c) ถูกกดเชื่อมแถวกับคอลัมน์ไว้ คืนแถวเป็น INPUT_PULLUP ก่อนแล้วจึง <code class="font-mono">return keys[r][c]</code></li>
+            <li><b>บรรทัด 57</b> ถ้าไม่เจอ คืนแถวเป็น INPUT_PULLUP แล้วไปแถวถัดไป</li>
+            <li><b>บรรทัด 60</b> ไม่มีปุ่มใดถูกกด คืนค่า 0</li>
+          </ol>
+          <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 text-sm">
+            <b>ทำไมคืนเป็น INPUT_PULLUP แทนการส่ง HIGH?</b> ถ้าส่ง HIGH แบบ OUTPUT แล้วผู้เล่นกดสองปุ่มในคอลัมน์เดียวกันพร้อมกัน
+            จะเกิดการลัดวงจรระหว่างขาที่เป็น HIGH กับขาที่เป็น LOW การใช้ pull-up ภายใน (~20–50 kΩ) จำกัดกระแสไว้ จึงปลอดภัยต่อบอร์ด
+          </div>
+        </div>
+      </section>
+
+      <!-- calculate -->
+      <section id="calculate" data-toc="calculate()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">5. <code class="font-mono">calculate()</code> — คำนวณ</h2>
+        <pre data-lines="63-76"></pre>
+        <p class="mt-4 text-slate-700">
+          รับตัวตั้ง <code class="font-mono">a</code> ตัวกระทำ <code class="font-mono">b</code> และเครื่องหมาย <code class="font-mono">op</code>
+          แล้วคืนผลลัพธ์เป็น <code class="font-mono">float</code> กรณีหารด้วยศูนย์จะคืน <code class="font-mono">NAN</code> (Not a Number)
+          ซึ่งเมื่อนำไปคำนวณต่อก็ยังเป็น NAN และถูกตรวจจับด้วย <code class="font-mono">isfinite()</code> ทำให้ตอบผิดเสมอ
+          ถ้า <code class="font-mono">op</code> ไม่ตรงกับเครื่องหมายใดจะคืน <code class="font-mono">a</code> กลับไปตามเดิม
+          ฟังก์ชันนี้ใช้ทั้งตอนสุ่มโจทย์และตอนผู้เล่นตอบ จึงคำนวณด้วยกติกาเดียวกันแน่นอน
+        </p>
+      </section>
+
+      <!-- secondsLeft -->
+      <section id="secondsLeft" data-toc="secondsLeft()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">6. <code class="font-mono">secondsLeft()</code> — เวลาที่เหลือ</h2>
+        <pre data-lines="78-86"></pre>
+        <ul class="mt-4 space-y-2 text-slate-700 list-disc pl-5">
+          <li><code class="font-mono">elapsed</code> คือเวลาที่ผ่านไปตั้งแต่เริ่มรอบ การลบแบบ unsigned ทำให้ยังถูกต้องแม้ <code class="font-mono">millis()</code> วนกลับเป็น 0 (ทุก ~49.7 วัน)</li>
+          <li>เวลาทั้งหมด = 100,000 ms + โบนัส ทุกครั้งที่ตอบถูกเวลารวมจะยืดออก 10 วินาที</li>
+          <li><code class="font-mono">+ 999UL</code> คือการปัดเศษขึ้น (ceiling) เช่น เหลือ 99,001 ms จะแสดง 100 วินาที และจะแสดง 0 ก็ต่อเมื่อหมดเวลาจริงเท่านั้น</li>
+        </ul>
+      </section>
+
+      <!-- show -->
+      <section id="show" data-toc="clearLine() / show()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">7. <code class="font-mono">clearLine()</code> และ <code class="font-mono">show()</code> — แสดงผล</h2>
+        <pre data-lines="88-146"></pre>
+        <div class="mt-4 space-y-3 text-slate-700">
+          <p>
+            <code class="font-mono">clearLine()</code> พิมพ์ช่องว่าง 16 ตัวทับแถวเดิมแล้วย้ายเคอร์เซอร์กลับต้นแถว เร็วกว่าและกะพริบน้อยกว่า
+            <code class="font-mono">lcd.clear()</code> ที่ล้างทั้งจอ
+          </p>
+          <p><code class="font-mono">show()</code> ทำงานเฉพาะเมื่อกำลังเล่น (<code class="font-mono">state == 1</code>) และบันทึก <code class="font-mono">lastSeconds</code> ไว้เพื่อให้ <code class="font-mono">loop()</code> รู้ว่าวาดจอไปแล้ว</p>
+          <div class="grid sm:grid-cols-2 gap-4 text-sm">
+            <div class="p-4 rounded-xl bg-white border border-slate-200">
+              <div class="font-semibold mb-2">แถวบน (บรรทัด 103–109)</div>
+              <div class="font-mono bg-lcd-bg text-lcd-text px-3 py-2 rounded whitespace-pre">T:24 87s S:3</div>
+              <p class="mt-2 text-slate-600">T = เป้าหมาย, ตามด้วยวินาทีที่เหลือ, S = คะแนน</p>
+            </div>
+            <div class="p-4 rounded-xl bg-white border border-slate-200">
+              <div class="font-semibold mb-2">แถวล่าง (บรรทัด 112–145)</div>
+              <div class="font-mono bg-lcd-bg text-lcd-text px-3 py-2 rounded whitespace-pre">- 2 - 4 =3.0*</div>
+              <p class="mt-2 text-slate-600">ถ้ามี feedback จะแสดงข้อความแล้ว <code class="font-mono">return</code> ทันที ไม่เช่นนั้นแสดงตัวเลข (ใช้แล้วเป็น <code class="font-mono">-</code>), <code class="font-mono">=</code> ผลลัพธ์ทศนิยม 1 ตำแหน่ง และเครื่องหมายที่รออยู่</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- resetAnswer -->
+      <section id="resetAnswer" data-toc="resetAnswer()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">8. <code class="font-mono">resetAnswer()</code> — ล้างคำตอบ</h2>
+        <pre data-lines="148-158"></pre>
+        <p class="mt-4 text-slate-700">
+          คืนค่าทุกช่องของ <code class="font-mono">used</code> เป็น false และรีเซ็ตตัวนับ ผลลัพธ์ เครื่องหมาย
+          โดย <strong>ไม่เปลี่ยน</strong> <code class="font-mono">numbers</code> และ <code class="font-mono">goal</code>
+          ใช้ตอนกด <b>*</b>, หลังตอบผิด และเป็นขั้นตอนสุดท้ายของ <code class="font-mono">newPuzzle()</code>
+        </p>
+      </section>
+
+      <!-- newPuzzle -->
+      <section id="newPuzzle" data-toc="newPuzzle()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">9. <code class="font-mono">newPuzzle()</code> — สุ่มโจทย์ที่มีคำตอบแน่นอน</h2>
+        <pre data-lines="160-212"></pre>
+        <div class="mt-4 space-y-3 text-slate-700">
+          <p>หัวใจของเกมคือการสร้างโจทย์ "ย้อนกลับ" — สุ่มคำตอบก่อน แล้วใช้ผลลัพธ์นั้นเป็นเป้าหมาย จึงรับประกันว่าทุกข้อมีทางแก้</p>
+          <ol class="list-decimal pl-5 space-y-2">
+            <li><b>บรรทัด 166–168</b> สุ่มเลข 1–9 จำนวน 4 ตัว (<code class="font-mono">random(1, 10)</code> ไม่รวมค่าบน)</li>
+            <li><b>บรรทัด 170–178</b> นำตัวเลขมาคำนวณจากซ้ายไปขวาด้วยเครื่องหมายสุ่ม แบบเดียวกับที่ผู้เล่นกด</li>
+            <li><b>บรรทัด 180–181</b> ตัดทิ้งถ้าผลเป็น NAN/อนันต์ หรืออยู่นอกช่วงประมาณ 10–99</li>
+            <li><b>บรรทัด 183–190</b> ผลลัพธ์ต้องเป็นจำนวนเต็ม — ใช้ <code class="font-mono">fabs(value - target) &lt; 0.001</code> แทน <code class="font-mono">==</code> เพราะ float มีความคลาดเคลื่อน เช่น 7 ÷ 3 × 3 อาจได้ 6.9999998</li>
+            <li><b>บรรทัด 194–200</b> ถ้าสุ่มครบ 500 ครั้งยังไม่ได้ (โอกาสน้อยมาก) ใช้โจทย์สำรอง 1 2 3 4 → 24 ซึ่ง (1+2+3)×4 = 24</li>
+            <li><b>บรรทัด 203–209</b> สลับตำแหน่งด้วยอัลกอริทึม <b>Fisher–Yates</b> เพื่อไม่ให้ลำดับตัวเลขบนจอบอกลำดับของคำตอบ</li>
+            <li><b>บรรทัด 211</b> เรียก <code class="font-mono">resetAnswer()</code> เตรียมรับคำตอบใหม่</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- start / end -->
+      <section id="rounds" data-toc="startRound() / endRound()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">10. <code class="font-mono">startRound()</code> และ <code class="font-mono">endRound()</code></h2>
+        <pre data-lines="214-242"></pre>
+        <ul class="mt-4 space-y-2 text-slate-700 list-disc pl-5">
+          <li><code class="font-mono">randomSeed(micros() ^ analogRead(A3))</code> กำหนดเมล็ดสุ่มจากเวลาระดับไมโครวินาทีที่ผู้เล่นกด # (คาดเดาไม่ได้) XOR กับสัญญาณรบกวนจากขา A3 ที่ปล่อยลอย ทำให้โจทย์แต่ละรอบไม่ซ้ำกัน</li>
+          <li>รีเซ็ตคะแนน โบนัส และ feedback สร้างโจทย์แรก บันทึกเวลาเริ่ม แล้วเปลี่ยนเป็นสถานะเล่น</li>
+          <li><code class="font-mono">lastSeconds = -1</code> บังคับให้จอวาดใหม่แน่นอนในรอบแรก</li>
+          <li><code class="font-mono">endRound()</code> เปลี่ยนเป็นสถานะ 2 และแสดงคะแนนพร้อมคำแนะนำให้กด # เล่นใหม่</li>
+        </ul>
+      </section>
+
+      <!-- handleKey -->
+      <section id="handleKey" data-toc="handleKey()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">11. <code class="font-mono">handleKey()</code> — ตรรกะการกดปุ่ม</h2>
+        <p class="text-slate-700 mb-4">ฟังก์ชันที่ยาวที่สุด รับปุ่มที่ผ่านการ debounce แล้วตัดสินว่าจะทำอะไร โดยตรวจเงื่อนไขทีละชั้นและ <code class="font-mono">return</code> ทันทีเมื่อทำงานเสร็จ</p>
+
+        <h3 class="font-semibold text-lg mt-6 mb-2">11.1 ด่านตรวจก่อนรับปุ่ม</h3>
+        <pre data-lines="244-266"></pre>
+        <ul class="mt-3 space-y-2 text-slate-700 list-disc pl-5">
+          <li>ถ้าไม่ได้อยู่ในสถานะเล่น รับเฉพาะ # เพื่อเริ่มรอบ ปุ่มอื่นถูกเพิกเฉย</li>
+          <li>ตรวจเวลาอีกชั้นหนึ่ง ป้องกันการตอบหลังเวลาหมดในจังหวะเดียวกัน</li>
+          <li>ระหว่างแสดงข้อความ 1 วินาที ล็อกปุ่มทั้งหมด ไม่ให้กดซ้อน</li>
+          <li><b>*</b> เรียก <code class="font-mono">resetAnswer()</code> ล้างคำตอบ</li>
+        </ul>
+
+        <h3 class="font-semibold text-lg mt-8 mb-2">11.2 กดตัวเลข</h3>
+        <pre data-lines="268-298"></pre>
+        <ul class="mt-3 space-y-2 text-slate-700 list-disc pl-5">
+          <li>รับตัวเลขเฉพาะเมื่อ <code class="font-mono">needNumber</code> เป็น true และยังใช้ไม่ครบ 4 ตัว ทำให้ต้องกดสลับ เลข-เครื่องหมาย-เลข</li>
+          <li><code class="font-mono">key - '0'</code> แปลงตัวอักษร ASCII เป็นตัวเลข เช่น '7' (55) − '0' (48) = 7</li>
+          <li>ลูปค้นหา <b>ช่องแรกที่ยังไม่ถูกใช้</b> และมีค่าตรงกัน วิธีนี้รองรับโจทย์ที่มีเลขซ้ำ เช่น 3 3 8 8 ได้ถูกต้อง ถ้าไม่พบ (กดเลขที่ไม่มีหรือใช้หมดแล้ว) ปุ่มจะถูกเพิกเฉย</li>
+          <li>ตัวเลขแรกกลายเป็นผลลัพธ์ตั้งต้น ตัวถัดไปนำไปคำนวณกับผลสะสมด้วยเครื่องหมายที่เลือกไว้</li>
+          <li>ทำเครื่องหมาย used, นับเพิ่ม, ล้างเครื่องหมาย และเปลี่ยนเป็นรอเครื่องหมาย</li>
+        </ul>
+
+        <h3 class="font-semibold text-lg mt-8 mb-2">11.3 กดเครื่องหมาย</h3>
+        <pre data-lines="300-314"></pre>
+        <p class="mt-3 text-slate-700">
+          รับเครื่องหมายได้เมื่อมีตัวเลขแล้วอย่างน้อย 1 ตัว ยังไม่ครบ 4 ตัว และกำลังรอเครื่องหมายอยู่
+          ใช้ ternary operator ซ้อนกันแปลง A/B/C/D เป็น + − * / แล้วกลับไปรอตัวเลข
+          (ถ้าผู้เล่นอยากเปลี่ยนเครื่องหมายต้องกด * ล้างแล้วเริ่มใหม่)
+        </p>
+
+        <h3 class="font-semibold text-lg mt-8 mb-2">11.4 กด # ส่งคำตอบ</h3>
+        <pre data-lines="316-364"></pre>
+        <div class="mt-3 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 text-slate-600"><tr><th class="px-4 py-2 text-left">เงื่อนไข</th><th class="px-4 py-2 text-left">ผล</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr><td class="px-4 py-2 font-mono">count == 0</td><td class="px-4 py-2">ข้ามข้อ — สุ่มโจทย์ใหม่ทันที ไม่เสียคะแนน (แต่เสียเวลา)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">count &lt; 4</td><td class="px-4 py-2">feedback = 2 → <code class="font-mono">Use all 4 nums!</code></td></tr>
+              <tr><td class="px-4 py-2 font-mono">needNumber || operation</td><td class="px-4 py-2">feedback = 3 — เงื่อนไขป้องกันไว้ก่อน (ในทางปฏิบัติไม่เกิด เพราะกดเครื่องหมายหลังเลขตัวที่ 4 ไม่ได้)</td></tr>
+              <tr><td class="px-4 py-2 font-mono">|result − goal| &lt; 0.001</td><td class="px-4 py-2">ถูก — <code class="font-mono">score++</code>, <code class="font-mono">timeBonus += 10000</code>, feedback = 1</td></tr>
+              <tr><td class="px-4 py-2">อื่น ๆ</td><td class="px-4 py-2">ผิด — feedback = 3 → <code class="font-mono">Incorrect!</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-slate-700">ทุกกรณีที่ตั้ง feedback จะบันทึก <code class="font-mono">feedbackStart = millis()</code> เพื่อให้ <code class="font-mono">loop()</code> นับ 1 วินาทีแล้วล้างข้อความเอง</p>
+      </section>
+
+      <!-- setup -->
+      <section id="setup" data-toc="setup()">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">12. <code class="font-mono">setup()</code> — เตรียมระบบ</h2>
+        <pre data-lines="366-380"></pre>
+        <p class="mt-4 text-slate-700">
+          ทำงานครั้งเดียวเมื่อเปิดเครื่องหรือกดรีเซ็ต ตั้งขา Keypad ทั้ง 8 ขาเป็น <code class="font-mono">INPUT_PULLUP</code>
+          เริ่มต้นจอ LCD เปิดไฟพื้นหลัง และแสดงหน้าจอต้อนรับ <code class="font-mono">Math Game 100s / # Start round</code>
+          ขณะนี้ <code class="font-mono">state</code> ยังเป็น 0 (รอเริ่ม)
+        </p>
+      </section>
+
+      <!-- loop -->
+      <section id="loop" data-toc="loop() และ Debounce">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">13. <code class="font-mono">loop()</code> — วงรอบหลักและการกรองปุ่มเด้ง</h2>
+
+        <h3 class="font-semibold text-lg mb-2">13.1 จัดการเวลาและข้อความ</h3>
+        <pre data-lines="382-413"></pre>
+        <ul class="mt-3 space-y-2 text-slate-700 list-disc pl-5">
+          <li>ถ้าเวลาหมดระหว่างเล่น เรียก <code class="font-mono">endRound()</code> ทันที แม้ผู้เล่นไม่ได้กดปุ่ม</li>
+          <li>ถ้าข้อความแสดงครบ <code class="font-mono">FEEDBACK_MS</code> (1 วินาที) แล้ว ล้าง feedback — ตอบถูกไปโจทย์ใหม่ นอกนั้นทำโจทย์เดิม</li>
+          <li>วาดจอใหม่ <b>เฉพาะเมื่อวินาทีเปลี่ยน</b> แทนที่จะวาดทุกรอบ ลดการส่งข้อมูล I2C และทำให้จอไม่กะพริบ</li>
+        </ul>
+
+        <h3 class="font-semibold text-lg mt-8 mb-2">13.2 Debounce — กรองการเด้งของปุ่ม</h3>
+        <pre data-lines="415-436"></pre>
+        <div class="mt-3 space-y-3 text-slate-700">
+          <p>
+            หน้าสัมผัสของปุ่มกลไกจะ "เด้ง" ติด-ดับหลายครั้งในช่วงไม่กี่มิลลิวินาทีแรก ถ้าไม่กรอง การกดครั้งเดียวอาจถูกนับหลายครั้ง
+            โค้ดนี้ใช้ตัวแปร <code class="font-mono">static</code> 3 ตัวซึ่งเก็บค่าไว้ข้ามรอบของ <code class="font-mono">loop()</code>
+          </p>
+          <ul class="list-disc pl-5 space-y-2">
+            <li><code class="font-mono">previous</code> ค่าที่อ่านได้ล่าสุด — ทุกครั้งที่ค่าเปลี่ยน จะจดเวลาไว้ใน <code class="font-mono">changed</code></li>
+            <li>ค่าต้อง <b>คงที่ติดต่อกันอย่างน้อย 25 ms</b> จึงถือว่าเชื่อถือได้</li>
+            <li><code class="font-mono">accepted</code> ค่าที่ยอมรับแล้ว — เรียก <code class="font-mono">handleKey()</code> เฉพาะเมื่อค่าที่นิ่งแล้วต่างจากเดิม และไม่ใช่ 0</li>
+          </ul>
+          <div class="p-4 rounded-xl bg-brand-50 border border-brand-100 text-sm">
+            ผลคือ <b>กด 1 ครั้ง = ทำงาน 1 ครั้ง</b> การกดค้างจะไม่ทำงานซ้ำ เพราะต้องปล่อยปุ่ม (ค่ากลับเป็น 0 และถูกยอมรับ) ก่อน จึงจะรับการกดครั้งถัดไปได้
+          </div>
+        </div>
+      </section>
+
+      <!-- full source -->
+      <section id="full" data-toc="โค้ดทั้งหมด">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">14. โค้ดทั้งหมด</h2>
+        <div class="flex flex-wrap gap-3 mb-4">
+          <button id="copyBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700">คัดลอกโค้ด</button>
+          <button id="dlBtn" class="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold hover:bg-slate-100">ดาวน์โหลด keypad_game.ino</button>
+        </div>
+        <details class="rounded-2xl border border-slate-200 bg-white" open>
+          <summary class="cursor-pointer px-5 py-3 font-semibold">keypad_game.ino (436 บรรทัด)</summary>
+          <div class="px-2 pb-2"><pre data-lines="all"></pre></div>
+        </details>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- ซอร์สโค้ดต้นฉบับ (สร้างจาก keypad_game.ino) -->
+<script type="text/plain" id="source">
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <math.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+const byte rows[4] = {9, 8, 7, 6};
+const byte cols[4] = {5, 4, 3, 2};
+
+const char keys[4][4] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+const unsigned long ROUND_MS = 100000UL;
+const unsigned long BONUS_MS = 10000UL;
+const unsigned long FEEDBACK_MS = 1000UL;
+
+unsigned long timeBonus = 0;
+unsigned long feedbackStart = 0;
+unsigned long roundStart = 0;
+
+byte numbers[4];
+bool used[4];
+byte count = 0;
+
+// 0 = รอเริ่ม, 1 = เล่น, 2 = หมดเวลา
+byte state = 0;
+
+// 0 = ไม่มีข้อความ, 1 = ถูก, 2 = ใช้เลขไม่ครบ, 3 = ผิด
+byte feedback = 0;
+
+int goal = 24;
+int score = 0;
+int lastSeconds = -1;
+
+float result = 0;
+char operation = 0;
+bool needNumber = true;
+
+// อ่านค่าจาก Keypad 4x4
+char readKey() {
+  for (byte r = 0; r < 4; r++) {
+    pinMode(rows[r], OUTPUT);
+    digitalWrite(rows[r], LOW);
+    delayMicroseconds(5);
+
+    for (byte c = 0; c < 4; c++) {
+      if (digitalRead(cols[c]) == LOW) {
+        pinMode(rows[r], INPUT_PULLUP);
+        return keys[r][c];
+      }
+    }
+
+    pinMode(rows[r], INPUT_PULLUP);
+  }
+
+  return 0;
+}
+
+// คำนวณทางคณิตศาสตร์
+float calculate(float a, float b, char op) {
+  switch (op) {
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+
+    case '/':
+      if (b == 0) return NAN;
+      return a / b;
+  }
+
+  return a;
+}
+
+// คำนวณเวลาที่เหลือ
+int secondsLeft() {
+  unsigned long elapsed = millis() - roundStart;
+  unsigned long totalTime = ROUND_MS + timeBonus;
+
+  if (elapsed >= totalTime) return 0;
+
+  return (totalTime - elapsed + 999UL) / 1000UL;
+}
+
+// ล้างข้อความหนึ่งแถวบน LCD
+void clearLine(byte row) {
+  lcd.setCursor(0, row);
+  lcd.print("                ");
+  lcd.setCursor(0, row);
+}
+
+// แสดงผลบน LCD
+void show() {
+  if (state != 1) return;
+
+  int seconds = secondsLeft();
+  lastSeconds = seconds;
+
+  // แถวบน: เป้าหมาย เวลา และคะแนน
+  clearLine(0);
+  lcd.print("T:");
+  lcd.print(goal);
+  lcd.print(' ');
+  lcd.print(seconds);
+  lcd.print("s S:");
+  lcd.print(score);
+
+  // แถวล่าง
+  clearLine(1);
+
+  if (feedback == 1) {
+    lcd.print("Correct! +10s");
+    return;
+  }
+
+  if (feedback == 2) {
+    lcd.print("Use all 4 nums!");
+    return;
+  }
+
+  if (feedback == 3) {
+    lcd.print("Incorrect!");
+    return;
+  }
+
+  // แสดงตัวเลขที่เหลือ
+  for (byte i = 0; i < 4; i++) {
+    if (used[i]) {
+      lcd.print('-');
+    } else {
+      lcd.print(numbers[i]);
+    }
+
+    lcd.print(' ');
+  }
+
+  lcd.print('=');
+  lcd.print(result, 1);
+
+  if (operation) {
+    lcd.print(operation);
+  }
+}
+
+// ล้างคำตอบ แต่ไม่เปลี่ยนโจทย์
+void resetAnswer() {
+  for (byte i = 0; i < 4; i++) {
+    used[i] = false;
+  }
+
+  count = 0;
+  result = 0;
+  operation = 0;
+  needNumber = true;
+}
+
+// สุ่มโจทย์ใหม่
+void newPuzzle() {
+  const char ops[4] = {'+', '-', '*', '/'};
+  bool found = false;
+
+  for (int attempt = 0; attempt < 500; attempt++) {
+    for (byte i = 0; i < 4; i++) {
+      numbers[i] = random(1, 10);
+    }
+
+    float value = numbers[0];
+
+    for (byte i = 1; i < 4; i++) {
+      value = calculate(
+        value,
+        numbers[i],
+        ops[random(0, 4)]
+      );
+    }
+
+    if (!isfinite(value)) continue;
+    if (value < 9.999 || value > 99.001) continue;
+
+    int target = (int)round(value);
+
+    if (target >= 10 && target <= 99 &&
+        fabs(value - target) < 0.001) {
+      goal = target;
+      found = true;
+      break;
+    }
+  }
+
+  // โจทย์สำรองหากสุ่มไม่สำเร็จ
+  if (!found) {
+    numbers[0] = 1;
+    numbers[1] = 2;
+    numbers[2] = 3;
+    numbers[3] = 4;
+    goal = 24;
+  }
+
+  // สลับตำแหน่งตัวเลข
+  for (byte i = 3; i > 0; i--) {
+    byte j = random(i + 1);
+
+    byte temp = numbers[i];
+    numbers[i] = numbers[j];
+    numbers[j] = temp;
+  }
+
+  resetAnswer();
+}
+
+// เริ่มเกมใหม่
+void startRound() {
+  randomSeed(micros() ^ analogRead(A3));
+
+  score = 0;
+  timeBonus = 0;
+  feedback = 0;
+
+  newPuzzle();
+
+  roundStart = millis();
+  lastSeconds = -1;
+  state = 1;
+
+  lcd.clear();
+  show();
+}
+
+// จบเกมเมื่อหมดเวลา
+void endRound() {
+  state = 2;
+  feedback = 0;
+
+  lcd.clear();
+  lcd.print("Time up! Score:");
+  lcd.setCursor(0, 1);
+  lcd.print(score);
+  lcd.print(" # play again");
+}
+
+// จัดการการกดปุ่ม
+void handleKey(char key) {
+  if (state != 1) {
+    if (key == '#') {
+      startRound();
+    }
+    return;
+  }
+
+  if (secondsLeft() == 0) {
+    endRound();
+    return;
+  }
+
+  // ระหว่างแสดงข้อความ ไม่รับคำสั่งใหม่
+  if (feedback != 0) return;
+
+  // * = ล้างคำตอบ
+  if (key == '*') {
+    resetAnswer();
+    show();
+    return;
+  }
+
+  // เลือกตัวเลข 0-9
+  if (key >= '0' && key <= '9') {
+    if (!needNumber || count >= 4) return;
+
+    byte value = key - '0';
+    int index = -1;
+
+    // ค้นหาตัวเลขที่ยังไม่ได้ใช้
+    for (byte i = 0; i < 4; i++) {
+      if (!used[i] && numbers[i] == value) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index == -1) return;
+
+    if (count == 0) {
+      result = value;
+    } else {
+      result = calculate(result, value, operation);
+    }
+
+    used[index] = true;
+    count++;
+    operation = 0;
+    needNumber = false;
+
+    show();
+    return;
+  }
+
+  // A = +, B = -, C = *, D = /
+  if (key >= 'A' && key <= 'D') {
+    if (count == 0 || count >= 4 || needNumber) {
+      return;
+    }
+
+    operation = key == 'A' ? '+' :
+                key == 'B' ? '-' :
+                key == 'C' ? '*' : '/';
+
+    needNumber = true;
+
+    show();
+    return;
+  }
+
+  // # = ส่งคำตอบ หรือข้ามข้อ
+  if (key == '#') {
+
+    // ข้ามข้อได้เฉพาะเมื่อยังไม่ใช้ตัวเลขเลย
+    if (count == 0) {
+      newPuzzle();
+      show();
+      return;
+    }
+
+    // ใช้ตัวเลขไม่ครบ 4 ตัว
+    if (count < 4) {
+      feedback = 2;
+      feedbackStart = millis();
+      show();
+      return;
+    }
+
+    // ใช้ครบ 4 ตัว แต่รูปแบบคำตอบยังไม่สมบูรณ์
+    if (needNumber || operation != 0) {
+      feedback = 3;
+      feedbackStart = millis();
+      show();
+      return;
+    }
+
+    // ตรวจคำตอบเมื่อใช้ตัวเลขครบทั้ง 4 ตัว
+    if (isfinite(result) &&
+        fabs(result - goal) < 0.001) {
+
+      // ตอบถูก
+      score++;
+      timeBonus += BONUS_MS;
+
+      feedback = 1;
+      feedbackStart = millis();
+
+      show();
+
+    } else {
+
+      // ตอบผิด
+      feedback = 3;
+      feedbackStart = millis();
+
+      show();
+    }
+  }
+}
+
+void setup() {
+  for (byte i = 0; i < 4; i++) {
+    pinMode(rows[i], INPUT_PULLUP);
+    pinMode(cols[i], INPUT_PULLUP);
+  }
+
+  lcd.init();
+  lcd.backlight();
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Math Game 100s");
+  lcd.setCursor(0, 1);
+  lcd.print("# Start round");
+}
+
+void loop() {
+  // ตรวจสอบเวลา
+  if (state == 1) {
+    if (secondsLeft() == 0) {
+      endRound();
+    } else {
+
+      // จัดการข้อความแจ้งเตือน
+      if (feedback != 0 &&
+          millis() - feedbackStart >= FEEDBACK_MS) {
+
+        byte previousFeedback = feedback;
+        feedback = 0;
+
+        if (previousFeedback == 1) {
+          // ตอบถูกแล้ว ไปโจทย์ใหม่
+          newPuzzle();
+        } else {
+          // ตอบผิดหรือใช้เลขไม่ครบ
+          // เริ่มทำโจทย์เดิมใหม่
+          resetAnswer();
+        }
+
+        show();
+      }
+
+      // อัปเดตเวลาบน LCD
+      if (secondsLeft() != lastSeconds) {
+        show();
+      }
+    }
+  }
+
+  // กรองการเด้งของปุ่ม (Debounce)
+  static char previous = 0;
+  static char accepted = 0;
+  static unsigned long changed = 0;
+
+  char key = readKey();
+
+  if (key != previous) {
+    previous = key;
+    changed = millis();
+  }
+
+  if (millis() - changed >= 25 &&
+      key != accepted) {
+
+    accepted = key;
+
+    if (key) {
+      handleKey(key);
+    }
+  }
+}</script>
+
+<script>
+  const SRC = document.getElementById('source').textContent.replace(/^\n/, '').replace(/\s+$/, '');
+  const LINES = SRC.split('\n');
+
+  // เติมโค้ดตามช่วงบรรทัด พร้อมเลขบรรทัดและไฮไลต์
+  document.querySelectorAll('pre[data-lines]').forEach(pre => {
+    const spec = pre.dataset.lines;
+    const [from, to] = spec === 'all' ? [1, LINES.length] : spec.split('-').map(Number);
+    const code = LINES.slice(from - 1, to).join('\n');
+    const html = hljs.highlight(code, { language: 'cpp' }).value;
+    const nums = Array.from({ length: to - from + 1 }, (_, i) => from + i).join('\n');
+
+    pre.className = 'rounded-2xl bg-slate-900 text-slate-100 text-[13px] leading-6 overflow-x-auto flex';
+    pre.innerHTML = `<span class="select-none text-right text-slate-500 pl-4 pr-4 py-4 border-r border-slate-700/70 bg-slate-950/40">${nums}</span><code class="hljs language-cpp block px-4 py-4 font-mono">${html}</code>`;
+  });
+
+  // สารบัญด้านข้าง
+  const toc = document.getElementById('toc');
+  const sections = [...document.querySelectorAll('section[data-toc]')];
+  sections.forEach(s => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.textContent = s.dataset.toc;
+    a.className = 'block -ml-px pl-4 py-1 border-l-2 border-transparent text-slate-500 hover:text-slate-900';
+    toc.appendChild(a);
+  });
+  const links = [...toc.querySelectorAll('a')];
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(l => {
+        const on = l.getAttribute('href') === '#' + e.target.id;
+        l.classList.toggle('border-brand-600', on);
+        l.classList.toggle('text-brand-700', on);
+        l.classList.toggle('font-semibold', on);
+        l.classList.toggle('border-transparent', !on);
+      });
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => io.observe(s));
+
+  // คัดลอก / ดาวน์โหลด
+  document.getElementById('copyBtn').addEventListener('click', async e => {
+    try { await navigator.clipboard.writeText(SRC); e.target.textContent = 'คัดลอกแล้ว ✓'; }
+    catch { e.target.textContent = 'คัดลอกไม่สำเร็จ'; }
+    setTimeout(() => e.target.textContent = 'คัดลอกโค้ด', 1500);
+  });
+  document.getElementById('dlBtn').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([SRC + '\n'], { type: 'text/plain' }));
+    a.download = 'keypad_game.ino';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+</script>
+</body>
+</html>

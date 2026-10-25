@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>การต่อวงจร · Keypad Math Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/site.js"></script>
+</head>
+<body data-page="circuit" class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <header class="mb-10">
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mt-1">การต่อวงจร Arduino</h1>
+    <p class="mt-3 text-slate-600 max-w-3xl leading-relaxed">
+      วงจรประกอบด้วยอุปกรณ์เพียง 3 ชิ้น คือ Arduino UNO, Keypad 4×4 และจอ LCD 16×2 แบบ I2C
+    </p>
+  </header>
+
+  <!-- Diagram -->
+  <section class="rounded-2xl bg-white border border-slate-200 p-4 md:p-6">
+    <figure>
+      <a href="assets/keypad-game.png" target="_blank" rel="noopener">
+        <img src="assets/keypad-game.png" alt="แผนภาพการต่อวงจร Arduino UNO กับ Keypad 4x4 และ LCD I2C"
+             class="w-full max-w-3xl mx-auto rounded-xl">
+      </a>
+      <figcaption class="text-center text-sm text-slate-500 mt-3">
+        แผนภาพการต่อวงจร (คลิกเพื่อดูภาพขนาดเต็ม) — สายสีเขียว = แถว (Row), สายสีแดง = คอลัมน์ (Column)
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- Pin tables -->
+  <section class="mt-12 grid lg:grid-cols-2 gap-8">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Keypad 4×4 → Arduino</h2>
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-100 text-slate-600">
+            <tr><th class="px-4 py-3 text-left">ขา Keypad</th><th class="px-4 py-3 text-left">หน้าที่</th><th class="px-4 py-3 text-left">ขา Arduino</th><th class="px-4 py-3 text-left">สาย</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono">
+            <tr><td class="px-4 py-2">1</td><td class="px-4 py-2 font-sans">Row 1 (1 2 3 A)</td><td class="px-4 py-2 font-semibold">D9</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-green-500"></span></td></tr>
+            <tr><td class="px-4 py-2">2</td><td class="px-4 py-2 font-sans">Row 2 (4 5 6 B)</td><td class="px-4 py-2 font-semibold">D8</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-green-500"></span></td></tr>
+            <tr><td class="px-4 py-2">3</td><td class="px-4 py-2 font-sans">Row 3 (7 8 9 C)</td><td class="px-4 py-2 font-semibold">D7</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-green-500"></span></td></tr>
+            <tr><td class="px-4 py-2">4</td><td class="px-4 py-2 font-sans">Row 4 (* 0 # D)</td><td class="px-4 py-2 font-semibold">D6</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-green-500"></span></td></tr>
+            <tr><td class="px-4 py-2">5</td><td class="px-4 py-2 font-sans">Col 1 (1 4 7 *)</td><td class="px-4 py-2 font-semibold">D5</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-red-500"></span></td></tr>
+            <tr><td class="px-4 py-2">6</td><td class="px-4 py-2 font-sans">Col 2 (2 5 8 0)</td><td class="px-4 py-2 font-semibold">D4</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-red-500"></span></td></tr>
+            <tr><td class="px-4 py-2">7</td><td class="px-4 py-2 font-sans">Col 3 (3 6 9 #)</td><td class="px-4 py-2 font-semibold">D3</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-red-500"></span></td></tr>
+            <tr><td class="px-4 py-2">8</td><td class="px-4 py-2 font-sans">Col 4 (A B C D)</td><td class="px-4 py-2 font-semibold">D2</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-red-500"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-slate-500 mt-3">นับขา Keypad จากซ้ายไปขวาเมื่อหันหน้าปุ่มเข้าหาตัว</p>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">LCD I2C → Arduino</h2>
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-100 text-slate-600">
+            <tr><th class="px-4 py-3 text-left">ขา LCD</th><th class="px-4 py-3 text-left">หน้าที่</th><th class="px-4 py-3 text-left">ขา Arduino</th><th class="px-4 py-3 text-left">สาย</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono">
+            <tr><td class="px-4 py-2">GND</td><td class="px-4 py-2 font-sans">กราวด์</td><td class="px-4 py-2 font-semibold">GND</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-slate-800"></span></td></tr>
+            <tr><td class="px-4 py-2">VCC</td><td class="px-4 py-2 font-sans">ไฟเลี้ยง 5V</td><td class="px-4 py-2 font-semibold">5V</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-green-500"></span></td></tr>
+            <tr><td class="px-4 py-2">SDA</td><td class="px-4 py-2 font-sans">สายข้อมูล I2C</td><td class="px-4 py-2 font-semibold">A4</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-purple-500"></span></td></tr>
+            <tr><td class="px-4 py-2">SCL</td><td class="px-4 py-2 font-sans">สายสัญญาณนาฬิกา I2C</td><td class="px-4 py-2 font-semibold">A5</td><td class="px-4 py-2"><span class="inline-block w-8 h-1.5 rounded bg-sky-500"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- <div class="mt-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-sm leading-relaxed text-amber-900">
+        <p class="font-semibold mb-1">หมายเหตุ</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>บน Arduino UNO ขา SDA/SCL คือ A4/A5 (หรือขา SDA/SCL ใกล้ AREF ก็ใช้ได้ เป็นขาเดียวกัน)</li>
+          <li>โค้ดใช้แอดเดรส <code class="font-mono">0x27</code> หากจอไม่แสดงผล ให้ลอง <code class="font-mono">0x3F</code> หรือรัน I2C Scanner</li>
+          <li>ถ้าจอสว่างแต่ไม่เห็นตัวอักษร ให้หมุนตัวต้านทานปรับค่า (สีฟ้า) ด้านหลังโมดูล I2C เพื่อปรับความคมชัด</li>
+          <li>ขา <code class="font-mono">A3</code> ปล่อยลอยไว้ (ไม่ต่ออะไร) เพื่อใช้อ่านค่าสัญญาณรบกวนเป็น seed ของการสุ่ม</li>
+        </ul>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- Interactive keypad -->
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold text-slate-900 mb-2">ทดลอง: ปุ่มไหนต่อกับขาอะไร?</h2>
+    <p class="text-slate-600 mb-6">ชี้หรือแตะปุ่มบน Keypad เพื่อดูว่าปุ่มนั้นเชื่อมแถวและคอลัมน์ใด</p>
+    <div class="grid md:grid-cols-2 gap-8 items-center">
+      <div class="mx-auto w-full max-w-xs rounded-3xl bg-slate-800 p-4 shadow-xl">
+        <div id="kp" class="grid grid-cols-4 gap-3"></div>
+      </div>
+      <div id="kpInfo" class="p-6 rounded-2xl bg-white border border-slate-200 min-h-[180px]">
+        <p class="text-slate-500">เลือกปุ่มเพื่อดูรายละเอียด</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How scanning works -->
+  <!-- <section class="mt-16 grid lg:grid-cols-2 gap-10">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">หลักการทำงานของ Keypad แบบเมทริกซ์</h2>
+      <div class="space-y-4 text-slate-700 leading-relaxed">
+        <p>
+          ภายใน Keypad มีสายแนวนอน 4 เส้น (Row) และแนวตั้ง 4 เส้น (Column) ตัดกันเป็นตาราง เมื่อกดปุ่ม
+          สายแถวและคอลัมน์ของปุ่มนั้นจะเชื่อมถึงกัน ทำให้ใช้ขาเพียง <strong>8 ขา</strong> แทนที่จะต้องใช้ 16 ขา
+        </p>
+        <p>
+          Arduino ตั้งขาทุกขาเป็น <code class="font-mono text-sm bg-slate-100 px-1 rounded">INPUT_PULLUP</code>
+          (ค่าปกติเป็น HIGH) แล้ว <strong>สแกนทีละแถว</strong> โดยดึงแถวนั้นลงเป็น LOW
+          จากนั้นอ่านค่าทุกคอลัมน์ — ถ้าคอลัมน์ใดอ่านได้ LOW แปลว่าปุ่มที่จุดตัดแถว-คอลัมน์นั้นถูกกด
+        </p>
+      </div>
+    </div>
+    <div class="p-6 rounded-2xl bg-white border border-slate-200">
+      <h3 class="font-semibold mb-4">ขั้นตอนการสแกน 1 รอบ</h3>
+      <ol class="space-y-3">
+        <li class="flex gap-3"><span class="w-7 h-7 shrink-0 rounded-full bg-brand-600 text-white grid place-items-center text-sm font-bold">1</span><span>ตั้ง Row r เป็น OUTPUT และส่งค่า LOW</span></li>
+        <li class="flex gap-3"><span class="w-7 h-7 shrink-0 rounded-full bg-brand-600 text-white grid place-items-center text-sm font-bold">2</span><span>รอ 5 ไมโครวินาทีให้สัญญาณนิ่ง</span></li>
+        <li class="flex gap-3"><span class="w-7 h-7 shrink-0 rounded-full bg-brand-600 text-white grid place-items-center text-sm font-bold">3</span><span>อ่าน Col 1–4 ถ้าเจอ LOW → คืนค่าปุ่ม <code class="font-mono">keys[r][c]</code></span></li>
+        <li class="flex gap-3"><span class="w-7 h-7 shrink-0 rounded-full bg-brand-600 text-white grid place-items-center text-sm font-bold">4</span><span>คืน Row r เป็น INPUT_PULLUP แล้วไปแถวถัดไป</span></li>
+        <li class="flex gap-3"><span class="w-7 h-7 shrink-0 rounded-full bg-slate-300 text-slate-700 grid place-items-center text-sm font-bold">5</span><span>ครบ 4 แถวไม่เจอ → คืนค่า 0 (ไม่มีปุ่มกด)</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold text-slate-900 mb-4">I2C คืออะไร ทำไมใช้แค่ 4 สาย</h2>
+    <p class="text-slate-700 leading-relaxed max-w-4xl">
+      จอ LCD 16×2 ปกติต้องใช้สายข้อมูล 6–10 เส้น แต่โมดูล I2C (ชิป PCF8574) ที่บัดกรีติดหลังจอ
+      จะแปลงข้อมูลอนุกรมจากสาย <strong>SDA</strong> (ข้อมูล) และ <strong>SCL</strong> (สัญญาณนาฬิกา)
+      ให้เป็นสัญญาณขนานไปควบคุมจอ จึงเหลือเพียงไฟเลี้ยง 2 เส้นกับสายสัญญาณ 2 เส้น และยังเหลือขาดิจิทัลไว้ให้ Keypad ใช้อย่างพอเพียง
+    </p>
+  </section> -->
+</main>
+
+<script>
+  const KEYS = [['1','2','3','A'],['4','5','6','B'],['7','8','9','C'],['*','0','#','D']];
+  const ROW_PINS = [9, 8, 7, 6];
+  const COL_PINS = [5, 4, 3, 2];
+  const ROLE = { A: 'เครื่องหมาย +', B: 'เครื่องหมาย −', C: 'เครื่องหมาย ×', D: 'เครื่องหมาย ÷', '*': 'ล้างคำตอบ', '#': 'ส่งคำตอบ / ข้ามข้อ / เริ่มเกม' };
+  const kp = document.getElementById('kp');
+  const info = document.getElementById('kpInfo');
+
+  KEYS.forEach((row, r) => row.forEach((k, c) => {
+    const special = /[A-D*#]/.test(k);
+    const b = document.createElement('button');
+    b.textContent = k;
+    b.className = `aspect-square rounded-lg text-2xl font-bold text-white shadow transition
+      focus:outline-none focus:ring-4 focus:ring-yellow-300 hover:scale-105
+      ${special ? 'bg-rose-400' : 'bg-sky-400'}`;
+    const showInfo = () => {
+      info.innerHTML = `
+        <div class="text-5xl font-bold text-slate-900 mb-4">${k}</div>
+        <dl class="grid grid-cols-2 gap-3 text-sm">
+          <div class="p-3 rounded-xl bg-green-50"><dt class="text-green-700">แถว</dt><dd class="font-mono font-semibold">Row ${r + 1} → D${ROW_PINS[r]}</dd></div>
+          <div class="p-3 rounded-xl bg-red-50"><dt class="text-red-700">คอลัมน์</dt><dd class="font-mono font-semibold">Col ${c + 1} → D${COL_PINS[c]}</dd></div>
+          <div class="col-span-2 p-3 rounded-xl bg-slate-50"><dt class="text-slate-500">หน้าที่ในเกม</dt><dd class="font-semibold">${ROLE[k] || 'เลือกตัวเลข ' + k}</dd></div>
+        </dl>`;
+    };
+    b.addEventListener('mouseenter', showInfo);
+    b.addEventListener('focus', showInfo);
+    b.addEventListener('click', showInfo);
+    kp.appendChild(b);
+  }));
+</script>
+</body>
+</html>

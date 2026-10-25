@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>บทคัดย่อ · Keypad Math Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/site.js"></script>
+</head>
+<body data-page="abstract" class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+<main>
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-brand-950 via-brand-900 to-brand-700 text-white">
+    <div class="max-w-6xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <span class="inline-block text-xs font-semibold tracking-wider uppercase bg-white/10 rounded-full px-3 py-1 mb-4">Physical Project</span>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight">เกมคำนวณเลข<br>บนแป้นกดจริง</h1>
+        <p class="mt-4 text-lg text-brand-100 leading-relaxed">
+          เกมฝึกคิดเลขเร็วแนวเดียวกับ <strong class="text-white">เกม 24</strong> ใช้ตัวเลข 4 ตัวกับเครื่องหมาย + − × ÷
+          ให้ได้ผลลัพธ์ตรงกับเป้าหมาย แข่งกับเวลา 100 วินาที
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="howto.html" class="px-5 py-3 rounded-xl bg-white text-brand-900 font-semibold hover:bg-brand-50">วิธีเล่น</a>
+          <a href="circuit.html" class="px-5 py-3 rounded-xl border border-white/30 font-semibold hover:bg-white/10">ดูการต่อวงจร</a>
+        </div>
+      </div>
+
+      <!-- LCD mock -->
+      <div class="mx-auto w-full max-w-md">
+        <div class="rounded-2xl bg-emerald-700 p-4 shadow-2xl ring-1 ring-black/20">
+          <div class="rounded-lg bg-slate-900 p-3">
+            <div class="rounded bg-lcd-bg px-4 py-3 font-mono text-lcd-text text-lg md:text-xl tracking-[0.2em] leading-relaxed shadow-inner">
+              <div>T:24 87s S:3</div>
+              <div>- 2 - 4 =3.0*</div>
+            </div>
+          </div>
+          <div class="mt-2 text-[10px] text-emerald-100/80 font-mono text-right">LCD 16×2 · I2C 0x27</div>
+        </div>
+        <p class="text-center text-sm text-brand-200 mt-4">ตัวอย่างหน้าจอระหว่างเล่น</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="max-w-6xl mx-auto px-4 py-16">
+    <div class="grid lg:grid-cols-3 gap-10">
+      <article class="lg:col-span-2">
+        <h2 class="text-3xl font-bold text-slate-900 mb-6">บทคัดย่อ (Abstract)</h2>
+        <div class="space-y-4 text-slate-700 leading-loose text-[17px]">
+          <p>
+            โครงงานนี้เป็นการพัฒนาเกมฝึกทักษะการคำนวณทางคณิตศาสตร์ที่เล่นได้จริงบนฮาร์ดแวร์ โดยใช้บอร์ด
+            <strong>Arduino UNO</strong> เป็นตัวประมวลผลหลัก รับข้อมูลผ่าน <strong>Keypad เมทริกซ์ 4×4</strong>
+            และแสดงผลผ่าน <strong>จอ LCD 16×2 แบบ I2C</strong> แนวคิดของเกมได้รับแรงบันดาลใจจากเกม 24
+            ที่ผู้เล่นต้องนำตัวเลข 4 ตัวมาคำนวณด้วยเครื่องหมายบวก ลบ คูณ หาร ให้ได้ผลลัพธ์ตามที่กำหนด
+          </p>
+          <p>
+            ต่างจากเกม 24 แบบดั้งเดิม เป้าหมายของเกมนี้จะเปลี่ยนไปทุกข้อในช่วง <strong>10–99</strong>
+            โดยระบบจะสุ่มตัวเลข 1–9 จำนวน 4 ตัว แล้วทดลองสุ่มเครื่องหมายจนได้ผลลัพธ์เป็นจำนวนเต็ม
+            จึงรับประกันได้ว่า <strong>ทุกโจทย์มีคำตอบอย่างน้อยหนึ่งแบบ</strong> การคำนวณเป็นแบบเรียงจากซ้ายไปขวา
+            (ไม่มีลำดับความสำคัญของเครื่องหมาย) ทำให้ผู้เล่นเห็นผลลัพธ์สะสมบนจอทุกครั้งที่กดปุ่ม
+          </p>
+          <p>
+            ผู้เล่นมีเวลาเริ่มต้น <strong>100 วินาที</strong> ตอบถูกได้ 1 คะแนนพร้อมเวลาเพิ่ม <strong>10 วินาที</strong>
+            เกมจบเมื่อเวลาหมด ในด้านซอฟต์แวร์ โครงงานได้ประยุกต์ใช้การสแกน Keypad ด้วยตัวเอง (ไม่ใช้ไลบรารี Keypad)
+            การกรองสัญญาณสั่นของปุ่ม (debounce) การจับเวลาแบบไม่บล็อกด้วย <code class="font-mono text-sm bg-slate-100 px-1 rounded">millis()</code>
+            และการจัดการสถานะของเกมแบบ State Machine
+          </p>
+        </div>
+
+        <div class="mt-10 p-6 rounded-2xl bg-white border border-slate-200">
+          <h3 class="font-bold text-lg mb-3">คำสำคัญ</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">Arduino UNO</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">Matrix Keypad</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">LCD I2C</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">เกม 24</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">State Machine</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">Debounce</span>
+            <span class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-sm">ฝึกคิดเลขเร็ว</span>
+          </div>
+        </div>
+      </article>
+
+      <aside class="space-y-6">
+        <div class="p-6 rounded-2xl bg-white border border-slate-200">
+          <h3 class="font-bold text-lg mb-4">ตัวเลขสำคัญของเกม</h3>
+          <dl class="grid grid-cols-2 gap-4">
+            <div class="p-3 rounded-xl bg-slate-50"><dt class="text-xs text-slate-500">เวลาเริ่มต้น</dt><dd class="text-2xl font-bold text-brand-700">100s</dd></div>
+            <div class="p-3 rounded-xl bg-slate-50"><dt class="text-xs text-slate-500">โบนัสต่อข้อ</dt><dd class="text-2xl font-bold text-emerald-600">+10s</dd></div>
+            <div class="p-3 rounded-xl bg-slate-50"><dt class="text-xs text-slate-500">ตัวเลขต่อข้อ</dt><dd class="text-2xl font-bold text-brand-700">4 ตัว</dd></div>
+            <div class="p-3 rounded-xl bg-slate-50"><dt class="text-xs text-slate-500">ช่วงเป้าหมาย</dt><dd class="text-2xl font-bold text-brand-700">10–99</dd></div>
+          </dl>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white border border-slate-200">
+          <h3 class="font-bold text-lg mb-4">อุปกรณ์ที่ใช้</h3>
+          <ul class="space-y-3 text-slate-700">
+            <li class="flex gap-3"><span class="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>Arduino UNO R3 × 1</li>
+            <li class="flex gap-3"><span class="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>Membrane Keypad 4×4 × 1</li>
+            <li class="flex gap-3"><span class="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>LCD 16×2 พร้อมโมดูล I2C (PCF8574) × 1</li>
+            <li class="flex gap-3"><span class="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>สายจัมเปอร์ผู้-ผู้ / ผู้-เมีย</li>
+            <li class="flex gap-3"><span class="mt-1 w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>สาย USB Type-B</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Objectives -->
+  <section class="bg-white border-y border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 py-16">
+      <h2 class="text-3xl font-bold text-slate-900 mb-8">วัตถุประสงค์</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="p-6 rounded-2xl bg-slate-50">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 text-white grid place-items-center font-bold mb-4">1</div>
+          <h3 class="font-semibold mb-2">ฝึกทักษะคณิตศาสตร์</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">ส่งเสริมการคิดเลขในใจ การวางแผน และการแก้ปัญหาภายใต้เวลาจำกัด</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-50">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 text-white grid place-items-center font-bold mb-4">2</div>
+          <h3 class="font-semibold mb-2">เรียนรู้ไมโครคอนโทรลเลอร์</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">ศึกษาการใช้งาน Arduino กับอุปกรณ์อินพุตและเอาต์พุตพื้นฐาน</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-50">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 text-white grid place-items-center font-bold mb-4">3</div>
+          <h3 class="font-semibold mb-2">เข้าใจการสแกน Keypad</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">เขียนโค้ดสแกนเมทริกซ์ 4×4 เองโดยใช้ INPUT_PULLUP และ debounce</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-slate-50">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 text-white grid place-items-center font-bold mb-4">4</div>
+          <h3 class="font-semibold mb-2">ออกแบบตรรกะเกม</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">ใช้ State Machine และจับเวลาแบบไม่บล็อก เพื่อให้เกมตอบสนองลื่นไหล</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System overview -->
+  <section class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold text-slate-900 mb-8">ภาพรวมการทำงานของระบบ</h2>
+    <div class="flex flex-col md:flex-row items-stretch gap-4">
+      <div class="flex-1 p-6 rounded-2xl bg-white border border-slate-200 text-center">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Input</div>
+        <div class="text-xl font-bold mt-1">Keypad 4×4</div>
+        <p class="text-sm text-slate-600 mt-2">ผู้เล่นกดตัวเลข เครื่องหมาย ล้าง และส่งคำตอบ</p>
+      </div>
+      <div class="hidden md:grid place-items-center text-3xl text-slate-400">→</div>
+      <div class="flex-1 p-6 rounded-2xl bg-brand-600 text-white text-center">
+        <div class="text-xs font-semibold text-brand-100 uppercase tracking-wider">Process</div>
+        <div class="text-xl font-bold mt-1">Arduino UNO</div>
+        <p class="text-sm text-brand-100 mt-2">สุ่มโจทย์ คำนวณ ตรวจคำตอบ จับเวลา นับคะแนน</p>
+      </div>
+      <div class="hidden md:grid place-items-center text-3xl text-slate-400">→</div>
+      <div class="flex-1 p-6 rounded-2xl bg-white border border-slate-200 text-center">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Output</div>
+        <div class="text-xl font-bold mt-1">LCD 16×2 I2C</div>
+        <p class="text-sm text-slate-600 mt-2">แสดงเป้าหมาย เวลา คะแนน ตัวเลข และผลลัพธ์</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

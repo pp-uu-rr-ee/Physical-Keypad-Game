@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>วิธีเล่น · Keypad Math Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="assets/site.js"></script>
+</head>
+<body data-page="howto" class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+<main class="max-w-6xl mx-auto px-4 py-12">
+  <header class="mb-10">
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mt-1">วิธีการเล่นเกม</h1>
+    <p class="mt-3 text-slate-600 max-w-3xl leading-relaxed">
+      ใช้ตัวเลขทั้ง 4 ตัวที่แสดงบนจอ ตัวละหนึ่งครั้ง นำมาบวก ลบ คูณ หาร ให้ได้ผลลัพธ์เท่ากับ
+      <strong>เป้าหมาย (T)</strong> ทำให้ได้มากข้อที่สุดก่อนเวลาหมด
+    </p>
+  </header>
+
+  <!-- Key map -->
+  <section>
+    <h2 class="text-2xl font-bold text-slate-900 mb-6">หน้าที่ของปุ่ม</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-5 rounded-2xl bg-white border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-sky-400 text-white font-bold grid place-items-center">0</span><span class="self-center text-slate-400">–</span><span class="w-9 h-9 rounded-lg bg-sky-400 text-white font-bold grid place-items-center">9</span></div>
+        <h3 class="font-semibold">ตัวเลข</h3>
+        <p class="text-sm text-slate-600 mt-1">เลือกตัวเลขจากโจทย์ ต้องเป็นเลขที่ยังไม่ถูกใช้</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white border border-slate-200">
+        <div class="flex gap-1 mb-3">
+          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">A</span>
+          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">B</span>
+          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">C</span>
+          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">D</span>
+        </div>
+        <h3 class="font-semibold">เครื่องหมาย</h3>
+        <p class="text-sm text-slate-600 mt-1"><b>A</b> = + &nbsp; <b>B</b> = − &nbsp; <b>C</b> = × &nbsp; <b>D</b> = ÷</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">*</span></div>
+        <h3 class="font-semibold">ล้างคำตอบ</h3>
+        <p class="text-sm text-slate-600 mt-1">เริ่มคิดโจทย์เดิมใหม่ ตัวเลขทั้งหมดกลับมาใช้ได้</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">#</span></div>
+        <h3 class="font-semibold">เริ่ม / ส่ง / ข้าม</h3>
+        <p class="text-sm text-slate-600 mt-1">เริ่มเกม · ส่งคำตอบ · ถ้ายังไม่กดเลขใดเลย = ข้ามข้อ</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="mt-16 grid lg:grid-cols-2 gap-10">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">ขั้นตอนการเล่น</h2>
+      <ol class="relative border-l-2 border-brand-200 ml-3 space-y-8">
+        <li class="pl-8 relative">
+          <span class="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-brand-600 text-white grid place-items-center font-bold">1</span>
+          <h3 class="font-semibold">เริ่มเกม</h3>
+          <p class="text-slate-600 text-sm mt-1">จอแสดง <code class="font-mono bg-slate-100 px-1 rounded">Math Game 100s</code> กด <b>#</b> เพื่อเริ่ม เวลาเริ่มนับถอยหลังจาก 100 วินาที</p>
+        </li>
+        <li class="pl-8 relative">
+          <span class="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-brand-600 text-white grid place-items-center font-bold">2</span>
+          <h3 class="font-semibold">อ่านโจทย์</h3>
+          <p class="text-slate-600 text-sm mt-1">แถวบนคือ <b>T</b> (เป้าหมาย), เวลาที่เหลือ และ <b>S</b> (คะแนน) แถวล่างคือตัวเลข 4 ตัวและผลลัพธ์สะสม</p>
+        </li>
+        <li class="pl-8 relative">
+          <span class="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-brand-600 text-white grid place-items-center font-bold">3</span>
+          <h3 class="font-semibold">กด ตัวเลข → เครื่องหมาย → ตัวเลข …</h3>
+          <p class="text-slate-600 text-sm mt-1">ต้องสลับกันเสมอ เริ่มด้วยตัวเลขและจบด้วยตัวเลข ตัวเลขที่ใช้แล้วจะกลายเป็น <code class="font-mono">-</code></p>
+        </li>
+        <li class="pl-8 relative">
+          <span class="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-brand-600 text-white grid place-items-center font-bold">4</span>
+          <h3 class="font-semibold">กด # ส่งคำตอบ</h3>
+          <p class="text-slate-600 text-sm mt-1">ถูก → +1 คะแนน และ +10 วินาที แล้วขึ้นโจทย์ใหม่ · ผิด → กลับมาทำโจทย์เดิมใหม่</p>
+        </li>
+        <li class="pl-8 relative">
+          <span class="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-slate-400 text-white grid place-items-center font-bold">5</span>
+          <h3 class="font-semibold">หมดเวลา</h3>
+          <p class="text-slate-600 text-sm mt-1">จอแสดง <code class="font-mono bg-slate-100 px-1 rounded">Time up! Score:</code> พร้อมคะแนน กด <b>#</b> เพื่อเล่นใหม่</p>
+        </li>
+      </ol>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">ตัวอย่างการเล่น 1 ข้อ</h2>
+      <div class="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+        <div class="px-5 py-3 bg-slate-100 text-sm">โจทย์: ตัวเลข <b>9 2 3 4</b> เป้าหมาย <b>T:24</b> → คำตอบ 9 ÷ 3 × 2 × 4 = 24</div>
+        <table class="w-full text-sm">
+          <thead class="text-slate-500"><tr><th class="px-5 py-2 text-left">กดปุ่ม</th><th class="px-5 py-2 text-left">แถวล่างของจอ</th></tr></thead>
+          <tbody class="divide-y divide-slate-100 font-mono">
+            <tr><td class="px-5 py-2">—</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">9 2 3 4 =0.0</span></td></tr>
+            <tr><td class="px-5 py-2">9</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- 2 3 4 =9.0</span></td></tr>
+            <tr><td class="px-5 py-2">D (÷)</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- 2 3 4 =9.0/</span></td></tr>
+            <tr><td class="px-5 py-2">3</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- 2 - 4 =3.0</span></td></tr>
+            <tr><td class="px-5 py-2">C (×)</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- 2 - 4 =3.0*</span></td></tr>
+            <tr><td class="px-5 py-2">2</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - 4 =6.0</span></td></tr>
+            <tr><td class="px-5 py-2">C (×)</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - 4 =6.0*</span></td></tr>
+            <tr><td class="px-5 py-2">4</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - - =24.0</span></td></tr>
+            <tr class="bg-emerald-50"><td class="px-5 py-2">#</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">Correct! +10s</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rules / tips -->
+  <section class="mt-16 grid md:grid-cols-2 gap-6">
+    <div class="p-6 rounded-2xl bg-white border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">กติกาที่ควรรู้</h2>
+      <ul class="space-y-3 text-slate-700 text-sm leading-relaxed list-disc pl-5">
+        <li><b>คำนวณจากซ้ายไปขวา</b> ไม่มีลำดับความสำคัญ เช่น 2 + 3 × 4 = (2 + 3) × 4 = 20</li>
+        <li>ต้องใช้ตัวเลข <b>ครบทั้ง 4 ตัว</b> ตัวละหนึ่งครั้ง ถ้าโจทย์มีเลขซ้ำ เช่น 3 3 ก็ใช้ได้ 2 ครั้ง</li>
+        <li>ผลลัพธ์ระหว่างทางเป็นทศนิยมหรือติดลบได้ แต่ผลสุดท้ายต้องเท่ากับเป้าหมาย</li>
+        <li>หารด้วย 0 จะได้ <code class="font-mono">nan</code> ซึ่งตอบผิดเสมอ</li>
+        <li>ทุกโจทย์ <b>มีคำตอบแน่นอน</b> เพราะระบบสร้างเป้าหมายจากตัวเลขชุดนั้นจริง ๆ</li>
+      </ul>
+    </div>
+    <div class="p-6 rounded-2xl bg-white border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">ข้อความบนจอ</h2>
+      <dl class="space-y-3 text-sm">
+        <div class="flex gap-3 items-start"><dt class="font-mono bg-lcd-bg text-lcd-text px-2 py-0.5 rounded shrink-0">Correct! +10s</dt><dd class="text-slate-600">ตอบถูก ได้คะแนนและเวลาเพิ่ม แสดง 1 วินาทีแล้วขึ้นข้อใหม่</dd></div>
+        <div class="flex gap-3 items-start"><dt class="font-mono bg-lcd-bg text-lcd-text px-2 py-0.5 rounded shrink-0">Use all 4 nums!</dt><dd class="text-slate-600">กด # ทั้งที่ใช้ตัวเลขไม่ครบ 4 ตัว</dd></div>
+        <div class="flex gap-3 items-start"><dt class="font-mono bg-lcd-bg text-lcd-text px-2 py-0.5 rounded shrink-0">Incorrect!</dt><dd class="text-slate-600">ผลลัพธ์ไม่ตรงเป้าหมาย ทำโจทย์เดิมใหม่</dd></div>
+        <div class="flex gap-3 items-start"><dt class="font-mono bg-lcd-bg text-lcd-text px-2 py-0.5 rounded shrink-0">Time up! Score:</dt><dd class="text-slate-600">หมดเวลา แสดงคะแนนรวม</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Simulator -->
+  <section id="simulator" class="mt-16">
+    <h2 class="text-2xl font-bold text-slate-900 mb-2">ลองเล่นบนเว็บ</h2>
+    <p class="text-slate-600 mb-6">ตัวจำลองนี้แปลตรรกะมาจากโค้ด Arduino โดยตรง กดปุ่มด้วยเมาส์ หรือใช้คีย์บอร์ด:
+      <span class="font-mono text-sm">0–9</span>, <span class="font-mono text-sm">+ - * /</span>, <span class="font-mono text-sm">Enter</span> = #, <span class="font-mono text-sm">Esc</span> = ล้าง</p>
+    <div class="rounded-3xl bg-gradient-to-br from-slate-200 to-slate-300 p-6 md:p-10 grid md:grid-cols-2 gap-8 items-center">
+      <div class="w-full max-w-md mx-auto">
+        <div class="rounded-2xl bg-emerald-700 p-3 md:p-4 shadow-xl">
+          <div class="rounded-lg bg-slate-900 p-2 md:p-3">
+            <div class="rounded bg-lcd-bg px-3 py-3 font-mono text-lcd-text text-[15px] sm:text-lg leading-relaxed shadow-inner overflow-hidden">
+              <div id="lcd0" class="whitespace-pre"></div>
+              <div id="lcd1" class="whitespace-pre"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-full max-w-[280px] mx-auto rounded-3xl bg-slate-800 p-4 shadow-xl">
+        <div id="simPad" class="grid grid-cols-4 gap-3"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/simulator.js"></script>
+</body>
+</html>
