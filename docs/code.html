@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>อธิบายโค้ด · Keypad Math Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/theme.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
   <script src="assets/site.js"></script>
@@ -47,18 +48,18 @@
           ทุกอย่างทำงานใน <code class="font-mono">loop()</code> โดยไม่ใช้ <code class="font-mono">delay()</code> เลย
           จึงอ่านปุ่มและนับเวลาได้พร้อมกัน
         </p>
-        <div class="mt-6 p-6 rounded-2xl bg-white border border-slate-200 overflow-x-auto">
+        <div class="mt-6 p-6 rounded-2xl bg-surface border border-slate-200 overflow-x-auto">
           <div class="flex items-center gap-3 min-w-[560px]">
             <div class="flex-1 p-4 rounded-xl bg-slate-100 text-center"><div class="font-mono text-xs text-slate-500">state = 0</div><div class="font-semibold">รอเริ่ม</div></div>
             <div class="text-center text-xs text-slate-500">กด #<div class="text-2xl text-slate-400">→</div></div>
-            <div class="flex-1 p-4 rounded-xl bg-brand-600 text-white text-center"><div class="font-mono text-xs text-brand-100">state = 1</div><div class="font-semibold">กำลังเล่น</div></div>
+            <div class="flex-1 p-4 rounded-xl bg-brand-600 text-white text-center"><div class="font-mono text-xs text-white/75">state = 1</div><div class="font-semibold">กำลังเล่น</div></div>
             <div class="text-center text-xs text-slate-500">เวลา = 0<div class="text-2xl text-slate-400">→</div></div>
-            <div class="flex-1 p-4 rounded-xl bg-rose-100 text-center"><div class="font-mono text-xs text-rose-600">state = 2</div><div class="font-semibold">หมดเวลา</div></div>
+            <div class="flex-1 p-4 rounded-xl bg-bad-soft text-center"><div class="font-mono text-xs text-bad">state = 2</div><div class="font-semibold">หมดเวลา</div></div>
           </div>
           <p class="text-center text-xs text-slate-500 mt-3 min-w-[560px]">จากสถานะ 2 กด # อีกครั้งจะกลับไปสถานะ 1 (เริ่มรอบใหม่)</p>
         </div>
         <div class="mt-6 grid sm:grid-cols-2 gap-4 text-sm">
-          <div class="p-4 rounded-xl bg-white border border-slate-200">
+          <div class="p-4 rounded-xl bg-surface border border-slate-200">
             <h3 class="font-semibold mb-2">ลำดับการเรียกฟังก์ชัน</h3>
             <ul class="font-mono space-y-1 text-slate-700">
               <li>loop() → readKey() → handleKey()</li>
@@ -67,7 +68,7 @@
               <li>show() → secondsLeft() / clearLine()</li>
             </ul>
           </div>
-          <div class="p-4 rounded-xl bg-white border border-slate-200">
+          <div class="p-4 rounded-xl bg-surface border border-slate-200">
             <h3 class="font-semibold mb-2">ค่า feedback</h3>
             <ul class="space-y-1 text-slate-700">
               <li><code class="font-mono">0</code> ไม่มีข้อความ (รับปุ่มตามปกติ)</li>
@@ -101,7 +102,7 @@
           ค่าเวลาเป็นมิลลิวินาทีและลงท้ายด้วย <code class="font-mono">UL</code> (unsigned long) เพื่อให้คำนวณร่วมกับ
           <code class="font-mono">millis()</code> ได้ถูกต้องโดยไม่ล้นช่วงของ <code class="font-mono">int</code> (สูงสุด 32,767)
         </p>
-        <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-surface">
           <table class="w-full text-sm">
             <thead class="bg-slate-100 text-slate-600"><tr><th class="px-4 py-2 text-left">ตัวแปร</th><th class="px-4 py-2 text-left">ชนิด</th><th class="px-4 py-2 text-left">ความหมาย</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
@@ -178,12 +179,12 @@
           </p>
           <p><code class="font-mono">show()</code> ทำงานเฉพาะเมื่อกำลังเล่น (<code class="font-mono">state == 1</code>) และบันทึก <code class="font-mono">lastSeconds</code> ไว้เพื่อให้ <code class="font-mono">loop()</code> รู้ว่าวาดจอไปแล้ว</p>
           <div class="grid sm:grid-cols-2 gap-4 text-sm">
-            <div class="p-4 rounded-xl bg-white border border-slate-200">
+            <div class="p-4 rounded-xl bg-surface border border-slate-200">
               <div class="font-semibold mb-2">แถวบน (บรรทัด 103–109)</div>
               <div class="font-mono bg-lcd-bg text-lcd-text px-3 py-2 rounded whitespace-pre">T:24 87s S:3</div>
               <p class="mt-2 text-slate-600">T = เป้าหมาย, ตามด้วยวินาทีที่เหลือ, S = คะแนน</p>
             </div>
-            <div class="p-4 rounded-xl bg-white border border-slate-200">
+            <div class="p-4 rounded-xl bg-surface border border-slate-200">
               <div class="font-semibold mb-2">แถวล่าง (บรรทัด 112–145)</div>
               <div class="font-mono bg-lcd-bg text-lcd-text px-3 py-2 rounded whitespace-pre">- 2 - 4 =3.0*</div>
               <p class="mt-2 text-slate-600">ถ้ามี feedback จะแสดงข้อความแล้ว <code class="font-mono">return</code> ทันที ไม่เช่นนั้นแสดงตัวเลข (ใช้แล้วเป็น <code class="font-mono">-</code>), <code class="font-mono">=</code> ผลลัพธ์ทศนิยม 1 ตำแหน่ง และเครื่องหมายที่รออยู่</p>
@@ -267,7 +268,7 @@
 
         <h3 class="font-semibold text-lg mt-8 mb-2">11.4 กด # ส่งคำตอบ</h3>
         <pre data-lines="316-364"></pre>
-        <div class="mt-3 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <div class="mt-3 overflow-x-auto rounded-2xl border border-slate-200 bg-surface">
           <table class="w-full text-sm">
             <thead class="bg-slate-100 text-slate-600"><tr><th class="px-4 py-2 text-left">เงื่อนไข</th><th class="px-4 py-2 text-left">ผล</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
@@ -327,10 +328,10 @@
       <section id="full" data-toc="โค้ดทั้งหมด">
         <h2 class="text-2xl font-bold text-slate-900 mb-4">14. โค้ดทั้งหมด</h2>
         <div class="flex flex-wrap gap-3 mb-4">
-          <button id="copyBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700">คัดลอกโค้ด</button>
-          <button id="dlBtn" class="px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold hover:bg-slate-100">ดาวน์โหลด keypad_game.ino</button>
+          <button id="copyBtn" class="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700">คัดลอกโค้ด</button>
+          <button id="dlBtn" class="px-4 py-2 rounded-lg border border-slate-300 bg-surface text-sm font-semibold hover:bg-slate-100">ดาวน์โหลด keypad_game.ino</button>
         </div>
-        <details class="rounded-2xl border border-slate-200 bg-white" open>
+        <details class="rounded-2xl border border-slate-200 bg-surface" open>
           <summary class="cursor-pointer px-5 py-3 font-semibold">keypad_game.ino (436 บรรทัด)</summary>
           <div class="px-2 pb-2"><pre data-lines="all"></pre></div>
         </details>
@@ -790,8 +791,8 @@ void loop() {
     const html = hljs.highlight(code, { language: 'cpp' }).value;
     const nums = Array.from({ length: to - from + 1 }, (_, i) => from + i).join('\n');
 
-    pre.className = 'rounded-2xl bg-slate-900 text-slate-100 text-[13px] leading-6 overflow-x-auto flex';
-    pre.innerHTML = `<span class="select-none text-right text-slate-500 pl-4 pr-4 py-4 border-r border-slate-700/70 bg-slate-950/40">${nums}</span><code class="hljs language-cpp block px-4 py-4 font-mono">${html}</code>`;
+    pre.className = 'rounded-2xl bg-code text-code-ink text-[13px] leading-6 overflow-x-auto flex';
+    pre.innerHTML = `<span class="select-none text-right text-white/35 pl-4 pr-4 py-4 border-r border-white/10 bg-black/25">${nums}</span><code class="hljs language-cpp block px-4 py-4 font-mono">${html}</code>`;
   });
 
   // สารบัญด้านข้าง

@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>วิธีเล่น · Keypad Math Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/theme.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
   <script src="assets/site.js"></script>
 </head>
@@ -24,28 +25,28 @@
   <section>
     <h2 class="text-2xl font-bold text-slate-900 mb-6">หน้าที่ของปุ่ม</h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-5 rounded-2xl bg-white border border-slate-200">
-        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-sky-400 text-white font-bold grid place-items-center">0</span><span class="self-center text-slate-400">–</span><span class="w-9 h-9 rounded-lg bg-sky-400 text-white font-bold grid place-items-center">9</span></div>
+      <div class="p-5 rounded-2xl bg-surface border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-keynum text-white font-bold grid place-items-center">0</span><span class="self-center text-slate-400">–</span><span class="w-9 h-9 rounded-lg bg-keynum text-white font-bold grid place-items-center">9</span></div>
         <h3 class="font-semibold">ตัวเลข</h3>
         <p class="text-sm text-slate-600 mt-1">เลือกตัวเลขจากโจทย์ ต้องเป็นเลขที่ยังไม่ถูกใช้</p>
       </div>
-      <div class="p-5 rounded-2xl bg-white border border-slate-200">
+      <div class="p-5 rounded-2xl bg-surface border border-slate-200">
         <div class="flex gap-1 mb-3">
-          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">A</span>
-          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">B</span>
-          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">C</span>
-          <span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">D</span>
+          <span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">A</span>
+          <span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">B</span>
+          <span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">C</span>
+          <span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">D</span>
         </div>
         <h3 class="font-semibold">เครื่องหมาย</h3>
         <p class="text-sm text-slate-600 mt-1"><b>A</b> = + &nbsp; <b>B</b> = − &nbsp; <b>C</b> = × &nbsp; <b>D</b> = ÷</p>
       </div>
-      <div class="p-5 rounded-2xl bg-white border border-slate-200">
-        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">*</span></div>
+      <div class="p-5 rounded-2xl bg-surface border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">*</span></div>
         <h3 class="font-semibold">ล้างคำตอบ</h3>
         <p class="text-sm text-slate-600 mt-1">เริ่มคิดโจทย์เดิมใหม่ ตัวเลขทั้งหมดกลับมาใช้ได้</p>
       </div>
-      <div class="p-5 rounded-2xl bg-white border border-slate-200">
-        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-rose-400 text-white font-bold grid place-items-center">#</span></div>
+      <div class="p-5 rounded-2xl bg-surface border border-slate-200">
+        <div class="flex gap-1 mb-3"><span class="w-9 h-9 rounded-lg bg-keyop text-white font-bold grid place-items-center">#</span></div>
         <h3 class="font-semibold">เริ่ม / ส่ง / ข้าม</h3>
         <p class="text-sm text-slate-600 mt-1">เริ่มเกม · ส่งคำตอบ · ถ้ายังไม่กดเลขใดเลย = ข้ามข้อ</p>
       </div>
@@ -87,7 +88,7 @@
 
     <div>
       <h2 class="text-2xl font-bold text-slate-900 mb-6">ตัวอย่างการเล่น 1 ข้อ</h2>
-      <div class="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+      <div class="rounded-2xl bg-surface border border-slate-200 overflow-hidden">
         <div class="px-5 py-3 bg-slate-100 text-sm">โจทย์: ตัวเลข <b>9 2 3 4</b> เป้าหมาย <b>T:24</b> → คำตอบ 9 ÷ 3 × 2 × 4 = 24</div>
         <table class="w-full text-sm">
           <thead class="text-slate-500"><tr><th class="px-5 py-2 text-left">กดปุ่ม</th><th class="px-5 py-2 text-left">แถวล่างของจอ</th></tr></thead>
@@ -100,7 +101,7 @@
             <tr><td class="px-5 py-2">2</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - 4 =6.0</span></td></tr>
             <tr><td class="px-5 py-2">C (×)</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - 4 =6.0*</span></td></tr>
             <tr><td class="px-5 py-2">4</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">- - - - =24.0</span></td></tr>
-            <tr class="bg-emerald-50"><td class="px-5 py-2">#</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">Correct! +10s</span></td></tr>
+            <tr class="bg-ok-soft"><td class="px-5 py-2">#</td><td class="px-5 py-2"><span class="bg-lcd-bg text-lcd-text px-2 py-0.5 rounded whitespace-pre">Correct! +10s</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -109,7 +110,7 @@
 
   <!-- Rules / tips -->
   <section class="mt-16 grid md:grid-cols-2 gap-6">
-    <div class="p-6 rounded-2xl bg-white border border-slate-200">
+    <div class="p-6 rounded-2xl bg-surface border border-slate-200">
       <h2 class="text-xl font-bold text-slate-900 mb-4">กติกาที่ควรรู้</h2>
       <ul class="space-y-3 text-slate-700 text-sm leading-relaxed list-disc pl-5">
         <li><b>คำนวณจากซ้ายไปขวา</b> ไม่มีลำดับความสำคัญ เช่น 2 + 3 × 4 = (2 + 3) × 4 = 20</li>
@@ -119,7 +120,7 @@
         <li>ทุกโจทย์ <b>มีคำตอบแน่นอน</b> เพราะระบบสร้างเป้าหมายจากตัวเลขชุดนั้นจริง ๆ</li>
       </ul>
     </div>
-    <div class="p-6 rounded-2xl bg-white border border-slate-200">
+    <div class="p-6 rounded-2xl bg-surface border border-slate-200">
       <h2 class="text-xl font-bold text-slate-900 mb-4">ข้อความบนจอ</h2>
       <dl class="space-y-3 text-sm">
         <div class="flex gap-3 items-start"><dt class="font-mono bg-lcd-bg text-lcd-text px-2 py-0.5 rounded shrink-0">Correct! +10s</dt><dd class="text-slate-600">ตอบถูก ได้คะแนนและเวลาเพิ่ม แสดง 1 วินาทีแล้วขึ้นข้อใหม่</dd></div>
@@ -135,18 +136,16 @@
     <h2 class="text-2xl font-bold text-slate-900 mb-2">ลองเล่นบนเว็บ</h2>
     <p class="text-slate-600 mb-6">ตัวจำลองนี้แปลตรรกะมาจากโค้ด Arduino โดยตรง กดปุ่มด้วยเมาส์ หรือใช้คีย์บอร์ด:
       <span class="font-mono text-sm">0–9</span>, <span class="font-mono text-sm">+ - * /</span>, <span class="font-mono text-sm">Enter</span> = #, <span class="font-mono text-sm">Esc</span> = ล้าง</p>
-    <div class="rounded-3xl bg-gradient-to-br from-slate-200 to-slate-300 p-6 md:p-10 grid md:grid-cols-2 gap-8 items-center">
-      <div class="w-full max-w-md mx-auto">
-        <div class="rounded-2xl bg-emerald-700 p-3 md:p-4 shadow-xl">
-          <div class="rounded-lg bg-slate-900 p-2 md:p-3">
-            <div class="rounded bg-lcd-bg px-3 py-3 font-mono text-lcd-text text-[15px] sm:text-lg leading-relaxed shadow-inner overflow-hidden">
-              <div id="lcd0" class="whitespace-pre"></div>
-              <div id="lcd1" class="whitespace-pre"></div>
-            </div>
+    <div class="rounded-2xl bg-slate-100 border border-slate-200 p-5 md:p-10 grid md:grid-cols-[1.3fr_1fr] gap-8 items-center">
+      <div class="w-full max-w-lg mx-auto min-w-0">
+        <div class="lcd-module">
+          <div class="lcd-pads" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="bg-bezel rounded p-[3%]">
+            <div class="lcd-screen"><div id="simLcd" aria-live="polite"></div></div>
           </div>
         </div>
       </div>
-      <div class="w-full max-w-[280px] mx-auto rounded-3xl bg-slate-800 p-4 shadow-xl">
+      <div class="w-full max-w-[280px] mx-auto rounded-3xl bg-kp p-4 shadow-xl">
         <div id="simPad" class="grid grid-cols-4 gap-3"></div>
       </div>
     </div>

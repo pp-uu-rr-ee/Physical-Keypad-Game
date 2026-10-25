@@ -9,8 +9,7 @@
   let result = 0, operation = '', needNumber = true;
   let lines = ['Math Game 100s', '# Start round'];
 
-  const row0 = document.getElementById('lcd0');
-  const row1 = document.getElementById('lcd1');
+  const screen = document.getElementById('simLcd');
   const pad = document.getElementById('simPad');
 
   const rand = (a, b) => a + Math.floor(Math.random() * (b - a));
@@ -40,8 +39,7 @@
   }
 
   function render() {
-    row0.textContent = lines[0].padEnd(16).slice(0, 16);
-    row1.textContent = lines[1].padEnd(16).slice(0, 16);
+    LCD.paint(screen, lines);
   }
 
   function show() {
@@ -161,8 +159,8 @@
     b.textContent = k;
     b.dataset.key = k;
     const special = /[A-D*#]/.test(k);
-    b.className = `aspect-square rounded-lg text-xl md:text-2xl font-bold text-white shadow
-      active:scale-95 transition select-none ${special ? 'bg-rose-400 hover:bg-rose-500' : 'bg-sky-400 hover:bg-sky-500'}`;
+    b.className = `key aspect-square rounded-lg text-xl md:text-2xl font-bold text-white
+      select-none ${special ? 'bg-keyop hover:brightness-110' : 'bg-keynum hover:brightness-110'}`;
     b.addEventListener('click', () => handleKey(k));
     pad.appendChild(b);
   });
@@ -176,7 +174,7 @@
     e.preventDefault();
     handleKey(k);
     const btn = pad.querySelector(`[data-key="${CSS.escape(k)}"]`);
-    if (btn) { btn.classList.add('ring-4', 'ring-yellow-300'); setTimeout(() => btn.classList.remove('ring-4', 'ring-yellow-300'), 120); }
+    if (btn) { btn.classList.add('ring-4', 'ring-pad'); setTimeout(() => btn.classList.remove('ring-4', 'ring-pad'), 120); }
   });
 
   render();
