@@ -79,7 +79,7 @@ function renderHeader(current) {
           <span class="rounded-sm bg-keynum"></span><span class="rounded-sm bg-keynum"></span>
           <span class="rounded-sm bg-keynum"></span><span class="rounded-sm bg-keyop"></span>
         </span>
-        <span class="font-semibold" style="font-family: var(--font-display)">Keypad Math Game</span>
+        <span class="font-semibold" style="font-family: var(--font-display)">Offbeat 180 iq</span>
       </a>
       <div class="flex items-center gap-1">
         <nav class="hidden md:flex items-center gap-1" aria-label="เมนูหลัก">${links}</nav>
