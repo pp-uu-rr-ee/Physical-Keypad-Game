@@ -29,7 +29,7 @@
 
 ## อุปกรณ์
 
-- Arduino UNO R3 × 1
+- Arduino UNO R4 × 1
 - Membrane Keypad 4×4 × 1
 - LCD  I2C × 1
 - สายจัมเปอร์ และสาย USB Type-C
@@ -51,8 +51,6 @@
 2. ติดตั้งไลบรารี **LiquidCrystal I2C** ผ่าน Library Manager
 3. เปิดไฟล์ [`keypad_game.ino`](keypad_game.ino) เลือกบอร์ด Arduino UNO และพอร์ตที่เสียบอยู่
 4. กด Upload
-
-> ถ้าจอไม่แสดงผล ให้ลองเปลี่ยนแอดเดรสในโค้ดจาก `0x27` เป็น `0x3F`
 
 ## วิธีเล่น
 
