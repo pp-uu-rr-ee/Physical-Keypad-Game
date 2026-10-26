@@ -73,3 +73,7 @@ https://pp-uu-rr-ee.github.io/Physical-Keypad-Game/
 ## คลิปวิดีโอ
 
 https://youtu.be/54avf26kf_c
+
+## โปสเตอร์
+
+[📄 ดูโปสเตอร์โปรเจกต์ (PDF)](project_offbeat.pdf)
